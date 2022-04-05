@@ -1,25 +1,5 @@
 provider "aws" {
-  region = "us-west-1"
-}
-
-resource "random_uuid" "ssh_key_uuid" {}
-
-resource "aws_key_pair" "shubhamtatvamasi" {
-  key_name   = "shubhamtatvamasi-key-${random_uuid.ssh_key_uuid.result}"
-  public_key = file("~/.ssh/id_rsa.pub")
-}
-
-data "aws_vpc" "default" {
-  default = true
-}
-
-module "ssh_security_group" {
-  source  = "terraform-aws-modules/security-group/aws//modules/ssh"
-  version = "~> 4.0"
-
-  name   = "ssh-security-group"
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  vpc_id = data.aws_vpc.default.id
+  region = local.region
 }
 
 module "ec2_instance" {
@@ -30,22 +10,22 @@ module "ec2_instance" {
 
   create_spot_instance = true
 
-  ami                    = "ami-075fd582acf0c0128" # Linux kernal 5.4.0-1009-aws - Ubuntu 20.04 LTS - us-west-1
-  instance_type          = "t3a.medium"
-  key_name               = aws_key_pair.shubhamtatvamasi.key_name
-  monitoring             = true
-  vpc_security_group_ids = [module.ssh_security_group.security_group_id]
-  subnet_id              = "subnet-2674e740"
+  ami           = local.ami
+  instance_type = local.instance_type
+  key_name      = aws_key_pair.shubhamtatvamasi.key_name
+  subnet_id     = local.subnet_id
+
+  vpc_security_group_ids = [
+    module.ssh_sg.security_group_id,
+    module.local_vpc_sg.security_group_id
+  ]
 
   root_block_device = [
     {
       volume_type = "gp3"
-      volume_size = 50
+      volume_size = local.volume_size
     }
   ]
 
-  tags = {
-    Terraform   = "true"
-    Environment = "dev"
-  }
+  tags = local.tags
 }
