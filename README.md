@@ -1,0 +1,1 @@
+# terraform-aws-spot-ec2-x86
