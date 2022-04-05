@@ -15,6 +15,14 @@ module "ec2_instance" {
   key_name      = aws_key_pair.shubhamtatvamasi.key_name
   subnet_id     = local.subnet_id
 
+  # network_interface = [
+  #   {
+  #     device_index          = 0
+  #     network_interface_id  = aws_network_interface.second_interface.id
+  #     delete_on_termination = true
+  #   }
+  # ]
+
   vpc_security_group_ids = [
     module.ssh_sg.security_group_id,
     module.local_vpc_sg.security_group_id
