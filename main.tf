@@ -9,6 +9,7 @@ module "ec2_instance" {
   name = "Docker AGW x86 - 5.4 Kernal"
 
   create_spot_instance = true
+  spot_type            = "one-time"
 
   ami           = local.ami
   instance_type = local.instance_type
