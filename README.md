@@ -1,12 +1,23 @@
 # terraform-aws-spot-ec2-x86
 
-Deploy Spot EC2 instance:
+Initalize terraform:
 ```bash
 terraform init
+```
+
+Deploy Spot EC2 instance:
+```bash
+export TF_VAR_attach_second_interface=false
+terraform apply -auto-approve
+
+export TF_VAR_attach_second_interface=true
 terraform apply -auto-approve
 ```
 
-Update your `/etc/netplan/50-cloud-init.yaml` file:
+Update your netplan configuration:
+```bash
+sudo vim /etc/netplan/50-cloud-init.yaml
+```
 ```yaml
 network:
     ethernets:
@@ -14,15 +25,33 @@ network:
             dhcp4: true
             dhcp6: false
             match:
-                macaddress: 02:b1:38:70:da:63
+                macaddress: 02:7c:d7:e8:c8:01
             set-name: eth0
         ens6:
             addresses:
-            - 172.31.20.108/20
+            - 172.31.17.61/20
             dhcp4: false
             dhcp6: false
             match:
-                macaddress: 02:1b:81:42:ee:49
+                macaddress: 02:c3:3f:32:cf:e1
             set-name: eth1
     version: 2
+```
+
+
+### terraform workspace
+
+List all workspaces:
+```bash
+terraform workspace list
+```
+
+Create new workspace:
+```bash
+terraform workspace new 2nd-vm
+```
+
+Apply changes:
+```bash
+terraform apply -auto-approve
 ```
